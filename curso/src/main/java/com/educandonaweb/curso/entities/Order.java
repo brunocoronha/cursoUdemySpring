@@ -1,7 +1,13 @@
 package com.educandonaweb.curso.entities;
 
+
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.tomcat.util.http.parser.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.educandonaweb.curso.entities.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -12,16 +18,20 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
-@Getter
+
 @Setter
+@Getter
 @NoArgsConstructor
 
 
+@Slf4j
 @Entity
 @Table(name = "td_order")
 public class Order implements Serializable {    
@@ -32,14 +42,18 @@ public class Order implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
 	private Instant moment;
-	
-	private Integer orderStatus;
+
+    private Integer orderStatus;
 
     @ManyToOne
     @JoinColumn(name = "client_id")
     private User client;
+
+    @OneToMany(mappedBy = "id.order")
+    private Set<OrderItem> items = new HashSet<>();
+
     
     public Order(Long id, Instant moment, OrderStatus orderStatus, User client){
         super();
@@ -84,5 +98,12 @@ public class Order implements Serializable {
         return true;
     }
 
+
+    @GetMapping(produces = {    MediaType.APPLICATION_JSON_VALUE,
+                                MediaType.APPLICATION_JSON_VALUE})
+    public String listaPessoa(){
+        log.info("METODO GET");
+        return "FACULDADE SENAI FATESG";
+    }
     
 }
